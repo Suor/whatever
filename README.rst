@@ -1,5 +1,7 @@
-Whatever
-========
+The Whatever Object
+===================
+
+Inspired by Perl 6 one, see http://perlcabal.org/syn/S02.html#The_Whatever_Object
 
 Usage
 -----
