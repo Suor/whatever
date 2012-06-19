@@ -15,7 +15,15 @@ __ALL__ = ['_', 'that']
 # TODO: pow with module arg:
 # object.__pow__(self, other[, modulo])
 
+# NOTE: Is this possible:
+#     map(_.meth(1,2,3), objects)
+# A problem that _.meth when called should return a "meth" attribute of it's caller
+# not schedule call as here.
+
+
 class Whatever(object):
+    # TODO: use WhateverCode in __getattr__ and __getitem__
+
     def __getattr__(self, name):
         return operator.attrgetter(name)
 
