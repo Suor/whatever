@@ -58,3 +58,13 @@ def test_comparison():
     assert (_ != None)(None) is (None != None)
 
     assert filter(5 < _, range(10)) == [6, 7, 8, 9]
+
+
+def test_unary():
+    assert callable(-_)
+    assert callable(abs(_))
+
+    assert (-_)(5) == -5
+    assert abs(_)(-5) == 5
+    assert min([2,3,5,6], key=-_) == 6
+

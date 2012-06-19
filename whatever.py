@@ -6,22 +6,14 @@ See http://perlcabal.org/syn/S02.html#The_Whatever_Object
 """
 import operator
 
+__ALL__ = ['_', 'that']
+
 # TODO:
 # # vararg, no reverse
 # object.__call__(self[, args...])
 
-# # vararg with reverse
-
-# # pow
+# TODO: pow with module arg:
 # object.__pow__(self, other[, modulo])
-# object.__rpow__(self, other)
-
-# # unary
-# object.__neg__(self)
-# object.__pos__(self)
-# object.__abs__(self)
-# object.__invert__(self)
-
 
 class Whatever(object):
     def __getattr__(self, name):
@@ -31,26 +23,38 @@ class Whatever(object):
         return operator.itemgetter(key)
 
 
-def _binary(op):
+def unary(op):
+    return lambda self: lambda that: op(that)
+
+def binary(op):
     return lambda self, other: lambda that: op(that, other)
 
-def _rbinary(op):
+def rbinary(op):
     return lambda self, other: lambda that: op(other, that)
 
-for name in ['__lt__', '__le__', '__eq__', '__ne__', '__gt__', '__ge__']:
-    op = getattr(operator, name)
-    setattr(Whatever, name, _binary(op))
+def rname(name):
+    return name[:2] + 'r' + name[2:]
 
-reversible = ['__add__', '__sub__', '__mul__', '__floordiv__', '__mod__',
-              '__lshift__', '__rshift__', '__and__', '__xor__', '__or__',
-              '__div__', '__truediv__']
-for name in reversible:
-    op = getattr(operator, name)
-    rname = name[:2] + 'r' + name[2:]
-    setattr(Whatever, name, _binary(op))
-    setattr(Whatever, rname, _rbinary(op))
+def op(name, func=None, args=2, reversible=False):
+    return (name, func or getattr(operator, name), args, reversible)
 
-# TODO: __cmp__ __divmod__ with cmp() and divmod() funcs
+def ops(names, args=2, reversible=False):
+    return [op(name, args=args, reversible=reversible)
+            for name in names]
 
+OPS = ops(['__lt__', '__le__', '__eq__', '__ne__', '__gt__', '__ge__'])    \
+    + ops(['__add__', '__sub__', '__mul__', '__floordiv__', '__mod__',     \
+              '__lshift__', '__rshift__', '__and__', '__xor__', '__or__',   \
+              '__div__', '__truediv__', '__pow__'], reversible=True)        \
+    + [op('__cmp__', cmp), op('__divmod__', divmod, reversible=True)]     \
+    + ops(['__neg__', '__pos__', '__abs__', '__invert__'], args=1)
+
+for name, op, args, reversible in OPS:
+    if args == 1:
+        setattr(Whatever, name, unary(op))
+    elif args == 2:
+        setattr(Whatever, name, binary(op))
+        if reversible:
+            setattr(Whatever, rname(name), rbinary(op))
 
 _ = that = Whatever()
