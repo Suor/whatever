@@ -68,3 +68,19 @@ def test_unary():
     assert abs(_)(-5) == 5
     assert min([2,3,5,6], key=-_) == 6
 
+
+def test_chained_ops():
+    assert callable(_ + 1 + 2)
+    assert (_ + 1 + 2)(10) == 13
+
+    assert (_ * 2 + 3)(1) == 5
+    assert (_ + 2 * 3)(1) == 7
+
+    assert (_ + 1 + 1 + 1 + 1 + 1)(0) == 5
+    assert (_ + 1 + 1)(1) == 3
+    assert (1 + _ + 1)(1) == 3
+    assert (1 + 1 + _)(1) == 3
+
+    assert -abs(_)(-5) == -5
+    assert abs(3 - _)(10) == 7
+

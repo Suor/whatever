@@ -22,15 +22,31 @@ class Whatever(object):
     def __getitem__(self, key):
         return operator.itemgetter(key)
 
+class WhateverCode(object):
+    def __init__(self, func):
+        self._func = func
+
+    def __call__(self, *args, **kwargs):
+        return self._func(*args, **kwargs)
+
 
 def unary(op):
-    return lambda self: lambda that: op(that)
+    return lambda self: WhateverCode(lambda that: op(that))
 
 def binary(op):
-    return lambda self, other: lambda that: op(that, other)
+    return lambda self, other: WhateverCode(lambda that: op(that, other))
 
 def rbinary(op):
-    return lambda self, other: lambda that: op(other, that)
+    return lambda self, other: WhateverCode(lambda that: op(other, that))
+
+def code_unary(op):
+    return lambda self: WhateverCode(lambda that: op(self(that)))
+
+def code_binary(op):
+    return lambda self, other: WhateverCode(lambda that: op(self(that), other))
+
+def code_rbinary(op):
+    return lambda self, other: WhateverCode(lambda that: op(other, self(that)))
 
 def rname(name):
     return name[:2] + 'r' + name[2:]
@@ -50,11 +66,15 @@ OPS = ops(['__lt__', '__le__', '__eq__', '__ne__', '__gt__', '__ge__'])    \
     + ops(['__neg__', '__pos__', '__abs__', '__invert__'], args=1)
 
 for name, op, args, reversible in OPS:
+    # print name, op, args, reversible
     if args == 1:
         setattr(Whatever, name, unary(op))
+        setattr(WhateverCode, name, code_unary(op))
     elif args == 2:
         setattr(Whatever, name, binary(op))
+        setattr(WhateverCode, name, code_binary(op))
         if reversible:
             setattr(Whatever, rname(name), rbinary(op))
+            setattr(WhateverCode, name, code_rbinary(op))
 
 _ = that = Whatever()
