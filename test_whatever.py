@@ -3,10 +3,11 @@ from whatever import _, that
 
 def test_basic():
     assert _ is that
-    assert callable(_.name)
 
 
-def test_attributes():
+def test_attrs():
+    assert callable(_.attr)
+
     class A(object):
         def __init__(self, name):
             self.name = name
@@ -19,6 +20,15 @@ def test_attributes():
 
     b = B()
     assert _.foo(b) == 'foofoo'
+
+
+def test_getitem():
+    assert callable(_[0])
+    assert _[0]([1, 2, 3]) == 1
+    assert _[1:]([1, 2, 3]) == [2, 3]
+
+    assert callable(_['item'])
+    assert _['name']({'name': 'zebra'}) == 'zebra'
 
 
 def test_add():
@@ -81,6 +91,37 @@ def test_chained_ops():
     assert (1 + _ + 1)(1) == 3
     assert (1 + 1 + _)(1) == 3
 
+    assert ( _  + 'y' + 'z')('x') == 'xyz'
+    assert ('x' +  _  + 'z')('y') == 'xyz'
+    assert ('x' + 'y' +  _ )('z') == 'xyz'
+
     assert -abs(_)(-5) == -5
     assert abs(3 - _)(10) == 7
+
+def test_chained_attrs():
+    class A(object):
+        def __init__(self, val):
+            self.val = val
+
+    assert callable(-that.val)
+    assert (-that.val)(A(10)) == -10
+    assert (that.val + 100)(A(10)) == 110
+
+    assert ((_ + ', ' + 'Guys!').lower)('Hi')() == 'hi, guys!'
+    assert that.val.val(A(A('a value'))) == 'a value'
+
+
+def test_chained_getitem():
+    assert callable(-that[0])
+    assert callable(-that[2:])
+    assert callable(that['key'] + 1)
+    assert callable((_ + 1)['key'])
+
+    assert (-_[0])([1,2,3]) == -1
+    assert (_[1:] + [4])([1,2,3]) == [2,3,4]
+    assert (_ + [4])[2:]([1,2,3]) == [3,4]
+
+    assert (_['val'] * 5)({'val': 2}) == 10
+    assert _['i']['j']({'i': {'j': 7}}) == 7
+
 

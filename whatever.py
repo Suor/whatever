@@ -8,8 +8,7 @@ import operator
 
 __ALL__ = ['_', 'that']
 
-# TODO:
-# # vararg, no reverse
+# TODO: or not to do
 # object.__call__(self[, args...])
 
 # TODO: pow with module arg:
@@ -19,16 +18,13 @@ __ALL__ = ['_', 'that']
 #     map(_.meth(1,2,3), objects)
 # A problem that _.meth when called should return a "meth" attribute of it's caller
 # not schedule call as here.
+# NOTE: Maybe use some javascript-like syntax:
+#       _.meth.call(1,2,3) # or
+#       _.call('meth', 1,2,3)
 
 
 class Whatever(object):
-    # TODO: use WhateverCode in __getattr__ and __getitem__
-
-    def __getattr__(self, name):
-        return operator.attrgetter(name)
-
-    def __getitem__(self, key):
-        return operator.itemgetter(key)
+    pass
 
 class WhateverCode(object):
     def __init__(self, func):
@@ -68,10 +64,11 @@ def ops(names, args=2, reversible=False):
 
 OPS = ops(['__lt__', '__le__', '__eq__', '__ne__', '__gt__', '__ge__'])    \
     + ops(['__add__', '__sub__', '__mul__', '__floordiv__', '__mod__',     \
-              '__lshift__', '__rshift__', '__and__', '__xor__', '__or__',   \
-              '__div__', '__truediv__', '__pow__'], reversible=True)        \
-    + [op('__cmp__', cmp), op('__divmod__', divmod, reversible=True)]     \
-    + ops(['__neg__', '__pos__', '__abs__', '__invert__'], args=1)
+              '__lshift__', '__rshift__', '__and__', '__xor__', '__or__',  \
+              '__div__', '__truediv__', '__pow__'], reversible=True)       \
+    + [op('__cmp__', cmp), op('__divmod__', divmod, reversible=True)]      \
+    + ops(['__neg__', '__pos__', '__abs__', '__invert__'], args=1)         \
+    + [op('__getattr__', getattr), op('__getitem__')]
 
 for name, op, args, reversible in OPS:
     # print name, op, args, reversible

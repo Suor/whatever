@@ -22,4 +22,4 @@ Usage
 
     factorial = lambda n: reduce(_ * _, range(1, n))
 
-Last two examples are not implemented yet.
+Last example is not implemented yet.
