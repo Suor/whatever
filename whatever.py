@@ -80,6 +80,6 @@ for name, op, args, reversible in OPS:
         setattr(WhateverCode, name, code_binary(op))
         if reversible:
             setattr(Whatever, rname(name), rbinary(op))
-            setattr(WhateverCode, name, code_rbinary(op))
+            setattr(WhateverCode, rname(name), code_rbinary(op))
 
 _ = that = Whatever()
