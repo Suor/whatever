@@ -15,7 +15,7 @@ Usage
     names = map(that.name, guys)
 
     squares = map(_ ** 2, range(100))
-    three_digit_squares = filter(_ < 1000, squares)
+    three_digit_squares = filter(100 <= _ < 1000, squares)
 
     best = max(tries, key=_.score)
     sort(guys, key=-that.height)

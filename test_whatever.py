@@ -98,6 +98,13 @@ def test_chained_ops():
     assert -abs(_)(-5) == -5
     assert abs(3 - _)(10) == 7
 
+
+def test_chained_comparison():
+    assert (1 < _ < 10)(7)
+    assert not (1 < _ < 10)(10)
+    assert not (1 < _ < 10)(1)
+
+
 def test_chained_attrs():
     class A(object):
         def __init__(self, val):
