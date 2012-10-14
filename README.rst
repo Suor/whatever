@@ -1,6 +1,8 @@
 The Whatever Object
 ===================
 
+An easy way to make lambdas by partial application of python operators.
+
 Inspired by Perl 6 one, see http://perlcabal.org/syn/S02.html#The_Whatever_Object
 
 Usage
