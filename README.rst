@@ -16,12 +16,14 @@ Usage
     names = map(_.name, guys)
     names = map(that.name, guys)
 
+    odd = map(_ * 2 + 1, range(10))
+
     squares = map(_ ** 2, range(100))
-    three_digit_squares = filter(100 <= _ < 1000, squares)
+    small_squares = filter(_ < 100, squares)
 
     best = max(tries, key=_.score)
     sort(guys, key=-that.height)
 
-    factorial = lambda n: reduce(_ * _, range(1, n))
+    factorial = lambda n: reduce(_ * _, range(2, n+1))
 
-Last example is not implemented yet.
+NOTE: chained comparisons cannot be implemented since there is no boolean overloading in python.

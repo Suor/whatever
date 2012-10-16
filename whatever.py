@@ -35,22 +35,47 @@ class WhateverCode(object):
 
 
 def unary(op):
-    return lambda self: WhateverCode(lambda that: op(that))
-
-def binary(op):
-    return lambda self, other: WhateverCode(lambda that: op(that, other))
-
-def rbinary(op):
-    return lambda self, other: WhateverCode(lambda that: op(other, that))
+    return lambda self: WhateverCode(op)
 
 def code_unary(op):
     return lambda self: WhateverCode(lambda that: op(self(that)))
 
-def code_binary(op):
-    return lambda self, other: WhateverCode(lambda that: op(self(that), other))
 
-def code_rbinary(op):
-    return lambda self, other: WhateverCode(lambda that: op(other, self(that)))
+# Binary ops
+# w + d => wc(lambda x: x + d)                   # binary
+# d + w => wc(lambda x: d + x)                   # rbinary
+# c + d => wc(lambda *xs: c(*xs) + d)            # code_binary
+# d + c => wc(lambda *xs: d + c(*xs))            # code_rbinary
+# w + w => wc(+)                                 # binary
+# w + c => wc(lambda x, *ys: x + c(*ys))         # binary
+# c + w => wc(lambda *xs, y: c(*xs) + y)         # code_binary
+# c + c => wc(lambda *xs, *ys: c(*xs) + c(*ys))  # code_binary
+
+def operand_type(value):
+    return type(value) if isinstance(value, (Whatever, WhateverCode)) else None
+
+def gen_binary(op, left, right):
+    W, C, D = Whatever, WhateverCode, None
+    ops = {
+        (W, D): lambda x: op(x, right),
+        (D, W): lambda x: op(left, x),
+        (C, D): lambda *xs: op(left(*xs), right),
+        (D, C): lambda *xs: op(left, right(*xs)),
+        (W, W): op,
+        (W, C): lambda x, *ys: op(x, right(*ys)),
+        (C, W): lambda *xs: op(left(*xs[:-1]), xs[-1])
+    }
+    types = operand_type(left), operand_type(right)
+    if types not in ops:
+        raise NotImplementedError
+    return WhateverCode(ops[types])
+
+def binary(op):
+    return lambda left, right: gen_binary(op, left, right)
+
+def rbinary(op):
+    return lambda left, right: gen_binary(op, right, left)
+
 
 def rname(name):
     return name[:2] + 'r' + name[2:]
@@ -77,9 +102,9 @@ for name, op, args, reversible in OPS:
         setattr(WhateverCode, name, code_unary(op))
     elif args == 2:
         setattr(Whatever, name, binary(op))
-        setattr(WhateverCode, name, code_binary(op))
+        setattr(WhateverCode, name, binary(op))
         if reversible:
             setattr(Whatever, rname(name), rbinary(op))
-            setattr(WhateverCode, rname(name), code_rbinary(op))
+            setattr(WhateverCode, rname(name), rbinary(op))
 
 _ = that = Whatever()

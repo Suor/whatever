@@ -99,10 +99,11 @@ def test_chained_ops():
     assert abs(3 - _)(10) == 7
 
 
-def test_chained_comparison():
-    assert (1 < _ < 10)(7)
-    assert not (1 < _ < 10)(10)
-    assert not (1 < _ < 10)(1)
+# NOTE: this is impossible since there is no boolean overloading in python
+# def test_chained_comparison():
+#     assert (1 < _ < 10)(7)
+#     assert not (1 < _ < 10)(10)
+#     assert not (1 < _ < 10)(1)
 
 
 def test_chained_attrs():
@@ -131,4 +132,10 @@ def test_chained_getitem():
     assert (_['val'] * 5)({'val': 2}) == 10
     assert _['i']['j']({'i': {'j': 7}}) == 7
 
+
+def test_higher_cardinality():
+    assert (_ + _)(1, 2) == 3
+    assert (_ ** _ ** _)(2, 3, 4) == 2 ** 3 ** 4
+    assert ((_ ** _) ** _)(2, 3, 4) == (2 ** 3) ** 4
+    assert (_ ** (_ ** _))(2, 3, 4) == 2 ** (3 ** 4)
 
