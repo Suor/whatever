@@ -27,3 +27,10 @@ Usage
     factorial = lambda n: reduce(_ * _, range(2, n+1))
 
 NOTE: chained comparisons cannot be implemented since there is no boolean overloading in python.
+
+
+TODO
+----
+
+- make benches
+- use WhateverCode anonymous subclasses to optimize calls
