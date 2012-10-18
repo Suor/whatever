@@ -89,7 +89,7 @@ def test_chained_ops():
     assert (_ + 1 + 1 + 1 + 1 + 1)(0) == 5
     assert (_ + 1 + 1)(1) == 3
     assert (1 + _ + 1)(1) == 3
-    assert (1 + 1 + _)(1) == 3
+    assert (1 + (1 + _))(1) == 3
 
     assert ( _  + 'y' + 'z')('x') == 'xyz'
     assert ('x' +  _  + 'z')('y') == 'xyz'
