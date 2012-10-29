@@ -4,9 +4,10 @@ The Whatever object inspired by Perl 6 one.
 
 See http://perlcabal.org/syn/S02.html#The_Whatever_Object
 """
-import operator
+import operator, types
 
 __ALL__ = ['_', 'that']
+
 
 # TODO: or not to do
 # object.__call__(self[, args...])
@@ -27,14 +28,31 @@ class Whatever(object):
     pass
 
 class WhateverCode(object):
-    def __init__(self, func):
+    def __init__(self, func, arity=None):
         self._func = func
+        self._arity = arity
 
     def __call__(self, *args, **kwargs):
         return self._func(*args, **kwargs)
 
     def __nonzero__(self):
         return False
+
+    @property
+    def __code__(self):
+        return types.CodeType(
+            self._arity,
+            self._arity,
+            0,
+            0,
+            '',
+            (),
+            (),
+            (),
+            '',
+            'operator',
+            0,
+            '')
 
 
 def unary(op):
@@ -57,6 +75,15 @@ def code_unary(op):
 def operand_type(value):
     return type(value) if isinstance(value, (Whatever, WhateverCode)) else None
 
+def argcount(operand):
+    op_type = operand_type(operand)
+    if op_type is None:
+        return 0
+    elif op_type is Whatever:
+        return 1
+    else:
+        return operand._arity
+
 def gen_binary(op, left, right):
     W, C, D = Whatever, WhateverCode, None
     ops = {
@@ -71,7 +98,8 @@ def gen_binary(op, left, right):
     types = operand_type(left), operand_type(right)
     if types not in ops:
         raise NotImplementedError
-    return WhateverCode(ops[types])
+    arity = sum(map(argcount, [left, right]))
+    return WhateverCode(ops[types], arity=arity)
 
 def binary(op):
     return lambda left, right: gen_binary(op, left, right)

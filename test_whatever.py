@@ -139,3 +139,23 @@ def test_higher_cardinality():
     assert ((_ ** _) ** _)(2, 3, 4) == (2 ** 3) ** 4
     assert (_ ** (_ ** _))(2, 3, 4) == 2 ** (3 ** 4)
 
+
+def test_introspection():
+    assert (_ + 1).__code__.co_argcount == 1
+    assert (_ + _).__code__.co_argcount == 2
+    assert (_ + 1 + _).__code__.co_argcount == 2
+
+# def test_methodcall():
+#     class A(object):
+#         def meth(self):
+#             return 1
+
+#         def meth_with_arg(self, x):
+#             return x * 2
+#     a = A()
+
+#     assert callable(_.meth)
+#     assert callable(_.meth())
+#     assert _.meth()(a) == 1
+#     assert _.meth_with_arg(10)(a) == 20
+
