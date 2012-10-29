@@ -33,6 +33,9 @@ class WhateverCode(object):
     def __call__(self, *args, **kwargs):
         return self._func(*args, **kwargs)
 
+    def __nonzero__(self):
+        return False
+
 
 def unary(op):
     return lambda self: WhateverCode(op)

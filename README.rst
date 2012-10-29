@@ -32,10 +32,5 @@ NOTE: chained comparisons cannot be implemented since there is no boolean overlo
 TODO
 ----
 
-- make WhateverCode False?::
-
-    _ ** 2 == anything                        # always True
-    [1,2,that/2,4].index("Some random value") # is 2 - WTF?
-
 - make benches
 - use WhateverCode anonymous subclasses to optimize calls
