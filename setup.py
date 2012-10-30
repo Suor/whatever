@@ -2,11 +2,11 @@ from setuptools import setup
 
 setup(
     name='whatever',
-    version='0.2',
+    version='0.2.1',
     author='Alexander Schepanovski',
     author_email='suor.web@gmail.com',
 
-    description='Perl 6 like Whatever object.',
+    description='Easy way to make anonymous functions by partial application of operators.',
     long_description=open('README.rst').read(),
     url='http://github.com/Suor/whatever',
     license='BSD',
