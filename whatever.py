@@ -62,15 +62,7 @@ def code_unary(op):
     return lambda self: WhateverCode(lambda that: op(self(that)))
 
 
-# Binary ops
-# w + d => wc(lambda x: x + d)                   # binary
-# d + w => wc(lambda x: d + x)                   # rbinary
-# c + d => wc(lambda *xs: c(*xs) + d)            # code_binary
-# d + c => wc(lambda *xs: d + c(*xs))            # code_rbinary
-# w + w => wc(+)                                 # binary
-# w + c => wc(lambda x, *ys: x + c(*ys))         # binary
-# c + w => wc(lambda *xs, y: c(*xs) + y)         # code_binary
-# c + c => wc(lambda *xs, *ys: c(*xs) + c(*ys))  # code_binary
+### Binary ops
 
 def operand_type(value):
     return type(value) if isinstance(value, (Whatever, WhateverCode)) else None
@@ -84,22 +76,27 @@ def argcount(operand):
     else:
         return operand._arity
 
+def compose_codes(op, left, right):
+    la = left._arity
+    return lambda *xs: op(left(*xs[:la]), right(*xs[la:]))
+
 def gen_binary(op, left, right):
     W, C, D = Whatever, WhateverCode, None
     ops = {
-        (W, D): lambda x: op(x, right),
-        (D, W): lambda x: op(left, x),
-        (C, D): lambda *xs: op(left(*xs), right),
-        (D, C): lambda *xs: op(left, right(*xs)),
-        (W, W): op,
-        (W, C): lambda x, *ys: op(x, right(*ys)),
-        (C, W): lambda *xs: op(left(*xs[:-1]), xs[-1])
+        (W, D): lambda: lambda x: op(x, right),
+        (D, W): lambda: lambda x: op(left, x),
+        (C, D): lambda: lambda *xs: op(left(*xs), right),
+        (D, C): lambda: lambda *xs: op(left, right(*xs)),
+        (W, W): lambda: op,
+        (W, C): lambda: lambda x, *ys: op(x, right(*ys)),
+        (C, W): lambda: lambda *xs: op(left(*xs[:-1]), xs[-1]),
+        (C, C): lambda: compose_codes(op, left, right),
     }
     types = operand_type(left), operand_type(right)
     if types not in ops:
         raise NotImplementedError
     arity = sum(map(argcount, [left, right]))
-    return WhateverCode(ops[types], arity=arity)
+    return WhateverCode(ops[types](), arity=arity)
 
 def binary(op):
     return lambda left, right: gen_binary(op, left, right)

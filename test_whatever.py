@@ -145,6 +145,10 @@ def test_introspection():
     assert (_ + _).__code__.co_argcount == 2
     assert (_ + 1 + _).__code__.co_argcount == 2
 
+
+def test_code_to_code():
+    assert (_ ** 2 + _ ** 2)(3, 4) == 5 ** 2
+
 # def test_methodcall():
 #     class A(object):
 #         def meth(self):
