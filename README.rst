@@ -34,3 +34,4 @@ TODO
 
 - make benches
 - use WhateverCode anonymous subclasses to optimize calls
+- optimized version which returns lambdas and partial ops instead of WhateverCode
