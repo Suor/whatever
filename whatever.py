@@ -6,7 +6,7 @@ See http://perlcabal.org/syn/S02.html#The_Whatever_Object
 """
 import operator, types
 
-__ALL__ = ['_', 'that']
+__all__ = ['_', 'that']
 
 
 # TODO: or not to do
