@@ -8,7 +8,7 @@ Inspired by Perl 6 one, see http://perlcabal.org/syn/S02.html#The_Whatever_Objec
 Usage
 -----
 
-::
+.. code:: python
 
     from whatever import _, that
 
