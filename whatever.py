@@ -99,7 +99,7 @@ def gen_binary(op, left, right):
     types = operand_type(left), operand_type(right)
     if types not in ops:
         raise NotImplementedError
-    arity = sum(map(argcount, [left, right]))
+    arity = argcount(left) + argcount(right)
     return WhateverCode(ops[types](), arity=arity)
 
 def binary(op):
