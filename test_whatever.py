@@ -1,3 +1,4 @@
+import pytest
 from whatever import _, that
 
 
@@ -148,6 +149,11 @@ def test_introspection():
 
 def test_code_to_code():
     assert (_ ** 2 + _ ** 2)(3, 4) == 5 ** 2
+
+
+def test_contains():
+    with pytest.raises(NotImplementedError): 1 in _
+
 
 # def test_methodcall():
 #     class A(object):

@@ -25,7 +25,8 @@ __all__ = ['_', 'that']
 
 
 class Whatever(object):
-    pass
+    def __contains__(self, other):
+        raise NotImplementedError
 
 class WhateverCode(object):
     def __init__(self, func, arity=None):
@@ -37,6 +38,9 @@ class WhateverCode(object):
 
     def __nonzero__(self):
         return False
+
+    def __contains__(self, other):
+        raise NotImplementedError
 
     @property
     def __code__(self):
