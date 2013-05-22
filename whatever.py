@@ -26,7 +26,7 @@ __all__ = ['_', 'that']
 
 class Whatever(object):
     def __contains__(self, other):
-        raise NotImplementedError
+        raise NotImplementedError('Sorry, can\'t to hook "in" operator in this way')
 
 class WhateverCode(object):
     def __init__(self, func, arity=None):
@@ -40,7 +40,7 @@ class WhateverCode(object):
         return False
 
     def __contains__(self, other):
-        raise NotImplementedError
+        raise NotImplementedError('Sorry, can\'t to hook "in" operator in this way')
 
     @property
     def __code__(self):
