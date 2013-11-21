@@ -68,7 +68,7 @@ def test_comparison():
     assert (_ == None)(None) is (None == None)
     assert (_ != None)(None) is (None != None)
 
-    assert filter(5 < _, range(10)) == [6, 7, 8, 9]
+    assert list(filter(5 < _, range(10))) == [6, 7, 8, 9]
 
 
 def test_unary():
