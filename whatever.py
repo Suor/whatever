@@ -4,9 +4,10 @@ The Whatever object inspired by Perl 6 one.
 
 See http://perlcabal.org/syn/S02.html#The_Whatever_Object
 """
-import operator, types
+import operator, types, sys
 
 __all__ = ['_', 'that']
+_py_version = sys.version_info[0]
 
 
 # TODO: or not to do
@@ -42,21 +43,40 @@ class WhateverCode(object):
     def __contains__(self, other):
         raise NotImplementedError('Sorry, can\'t to hook "in" operator in this way')
 
-    @property
-    def __code__(self):
-        return types.CodeType(
-            self._arity,
-            self._arity,
-            0,
-            0,
-            '',
-            (),
-            (),
-            (),
-            '',
-            'operator',
-            0,
-            '')
+    # erk
+    if _py_version == 2:
+        @property
+        def __code__(self):
+            return types.CodeType(
+                self._arity,
+                self._arity,
+                0,
+                0,
+                '',
+                (),
+                (),
+                (),
+                '',
+                'operator',
+                0,
+                '')
+    elif _py_version == 3:
+        @property
+        def __code__(self):
+            return types.CodeType(
+                self._arity,
+                0,  # co_kwonlyargcount
+                self._arity,
+                0,
+                0,
+                b'',
+                (),
+                (),
+                (),
+                '',
+                'operator',
+                0,
+                b'')
 
 
 def unary(op):
@@ -122,10 +142,17 @@ def ops(names, args=2, reversible=False):
 OPS = ops(['__lt__', '__le__', '__eq__', '__ne__', '__gt__', '__ge__'])    \
     + ops(['__add__', '__sub__', '__mul__', '__floordiv__', '__mod__',     \
               '__lshift__', '__rshift__', '__and__', '__xor__', '__or__',  \
-              '__div__', '__truediv__', '__pow__'], reversible=True)       \
-    + [op('__cmp__', cmp), op('__divmod__', divmod, reversible=True)]      \
+              '__truediv__', '__pow__'], reversible=True)       \
+    + [op('__divmod__', divmod, reversible=True)]      \
     + ops(['__neg__', '__pos__', '__abs__', '__invert__'], args=1)         \
     + [op('__getattr__', getattr), op('__getitem__')]
+
+
+# OMG what about py1
+if _py_version == 2:
+    OPS += [op('__div__', reversible=True), op('__cmp__', cmp)]
+elif _py_version == 3:
+    OPS += [op('__floordiv__', reversible=True)]
 
 for name, op, args, reversible in OPS:
     # print name, op, args, reversible
