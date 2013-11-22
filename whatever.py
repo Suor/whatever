@@ -142,8 +142,8 @@ def ops(names, args=2, reversible=False):
 OPS = ops(['__lt__', '__le__', '__eq__', '__ne__', '__gt__', '__ge__'])    \
     + ops(['__add__', '__sub__', '__mul__', '__floordiv__', '__mod__',     \
               '__lshift__', '__rshift__', '__and__', '__xor__', '__or__',  \
-              '__truediv__', '__pow__'], reversible=True)       \
-    + [op('__divmod__', divmod, reversible=True)]      \
+              '__truediv__', '__pow__'], reversible=True)                  \
+    + [op('__divmod__', divmod, reversible=True)]                          \
     + ops(['__neg__', '__pos__', '__abs__', '__invert__'], args=1)         \
     + [op('__getattr__', getattr), op('__getitem__')]
 
