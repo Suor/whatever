@@ -32,6 +32,5 @@ NOTE: chained comparisons cannot be implemented since there is no boolean overlo
 TODO
 ----
 
-- make benches
-- use WhateverCode anonymous subclasses to optimize calls
-- optimized version which returns lambdas and partial ops instead of WhateverCode
+- use CONST.__op__ instead of lambdas to further optimize calls
+- consider optimized version which returns lambdas and partial ops instead of WhateverCode

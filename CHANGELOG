@@ -1,3 +1,6 @@
+- significant optimizations
+- support arity introspection for unary ops
+
 0.3
 - added Python 3 support (ashleyh)
 

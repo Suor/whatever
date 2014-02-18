@@ -29,19 +29,21 @@ class Whatever(object):
     def __contains__(self, other):
         raise NotImplementedError('Sorry, can\'t to hook "in" operator in this way')
 
+
 class WhateverCode(object):
-    def __init__(self, func, arity=None):
-        self._func = func
+    def __init__(self, arity):
         self._arity = arity
 
-    def __call__(self, *args, **kwargs):
-        return self._func(*args, **kwargs)
+    @classmethod
+    def make_call(cls, func, arity):
+        sub_cls = type('WhateverCodeCall', (WhateverCode,), {'__call__': staticmethod(func)})
+        return sub_cls(arity)
 
     def __nonzero__(self):
         return False
 
     def __contains__(self, other):
-        raise NotImplementedError('Sorry, can\'t to hook "in" operator in this way')
+        raise NotImplementedError('Sorry, can\'t hook "in" operator in this way')
 
     # erk
     if _py_version == 2:
@@ -80,16 +82,18 @@ class WhateverCode(object):
 
 
 def unary(op):
-    return lambda self: WhateverCode(op)
+    return lambda self: WhateverCode.make_call(op, 1)
 
 def code_unary(op):
-    return lambda self: WhateverCode(lambda that: op(self(that)))
+    return lambda self: WhateverCode.make_call(lambda that: op(self(that)), self._arity)
 
 
 ### Binary ops
 
 def operand_type(value):
-    return type(value) if isinstance(value, (Whatever, WhateverCode)) else None
+    return Whatever     if isinstance(value, Whatever) else     \
+           WhateverCode if isinstance(value, WhateverCode) else \
+           None
 
 def argcount(operand):
     op_type = operand_type(operand)
@@ -120,14 +124,13 @@ def gen_binary(op, left, right):
     if types not in ops:
         raise NotImplementedError
     arity = argcount(left) + argcount(right)
-    return WhateverCode(ops[types](), arity=arity)
+    return WhateverCode.make_call(ops[types](), arity=arity)
 
 def binary(op):
     return lambda left, right: gen_binary(op, left, right)
 
 def rbinary(op):
     return lambda left, right: gen_binary(op, right, left)
-
 
 def rname(name):
     return name[:2] + 'r' + name[2:]
@@ -155,7 +158,6 @@ elif _py_version == 3:
     OPS += [op('__floordiv__', reversible=True)]
 
 for name, op, args, reversible in OPS:
-    # print name, op, args, reversible
     if args == 1:
         setattr(Whatever, name, unary(op))
         setattr(WhateverCode, name, code_unary(op))
