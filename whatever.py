@@ -53,6 +53,8 @@ class WhateverCode(object):
         return types.CodeType(*args)
 
 
+### Unary ops
+
 def unary(op):
     return lambda self: WhateverCode.make_call(op, 1)
 
@@ -76,27 +78,33 @@ def argcount(operand):
     else:
         return operand._arity
 
-def compose_codes(op, left, right):
+def compose_codes(func, left, right):
     la = left._arity
-    return lambda *xs: op(left(*xs[:la]), right(*xs[la:]))
+    return lambda *xs: func(left(*xs[:la]), right(*xs[la:]))
 
 def gen_binary(op, left, right):
     W, C, D = Whatever, WhateverCode, None
+    name, rname, func, args = op
+    ltype, rtype = types = operand_type(left), operand_type(right)
+
+    if ltype is D:
+        _lfunc = lambda x: func(left, x)
+        lfunc = getattr(left, name, _lfunc) if rname else _lfunc
+    if rtype is D:
+        _rfunc = lambda x: func(x, right)
+        rfunc = getattr(right, rname, _rfunc) if rname else _rfunc
+
     ops = {
-        (W, D): lambda: lambda x: op(x, right),
-        (D, W): lambda: lambda x: op(left, x),
-        (C, D): lambda: lambda *xs: op(left(*xs), right),
-        (D, C): lambda: lambda *xs: op(left, right(*xs)),
-        (W, W): lambda: op,
-        (W, C): lambda: lambda x, *ys: op(x, right(*ys)),
-        (C, W): lambda: lambda *xs: op(left(*xs[:-1]), xs[-1]),
-        (C, C): lambda: compose_codes(op, left, right),
+        (W, D): lambda: rfunc,
+        (D, W): lambda: lfunc,
+        (C, D): lambda: lambda *xs: rfunc(left(*xs)),
+        (D, C): lambda: lambda *xs: lfunc(right(*xs)),
+        (W, W): lambda: func,
+        (W, C): lambda: lambda x, *ys: func(x, right(*ys)),
+        (C, W): lambda: lambda *xs: func(left(*xs[:-1]), xs[-1]),
+        (C, C): lambda: compose_codes(func, left, right),
     }
-    types = operand_type(left), operand_type(right)
-    if types not in ops:
-        raise NotImplementedError
-    arity = argcount(left) + argcount(right)
-    return WhateverCode.make_call(ops[types](), arity=arity)
+    return WhateverCode.make_call(ops[types](), arity=argcount(left) + argcount(right))
 
 def binary(op):
     return lambda left, right: gen_binary(op, left, right)
@@ -104,40 +112,48 @@ def binary(op):
 def rbinary(op):
     return lambda left, right: gen_binary(op, right, left)
 
-def rname(name):
-    return name[:2] + 'r' + name[2:]
 
-def op(name, func=None, args=2, reversible=False):
-    return (name, func or getattr(operator, name), args, reversible)
+### Define ops
 
-def ops(names, args=2, reversible=False):
-    return [op(name, args=args, reversible=reversible)
-            for name in names]
+def op(name, rname=None, func=None, args=2):
+    name = '__%s__' % name
+    if rname:
+        rname = '__%s__' % rname
+    return (name, rname, func or getattr(operator, name), args)
 
-OPS = ops(['__lt__', '__le__', '__eq__', '__ne__', '__gt__', '__ge__'])    \
-    + ops(['__add__', '__sub__', '__mul__', '__floordiv__', '__mod__',     \
-              '__lshift__', '__rshift__', '__and__', '__xor__', '__or__',  \
-              '__truediv__', '__pow__'], reversible=True)                  \
-    + [op('__divmod__', divmod, reversible=True)]                          \
-    + ops(['__neg__', '__pos__', '__abs__', '__invert__'], args=1)         \
-    + [op('__getattr__', getattr), op('__getitem__')]
+def rop(name, rname=None, func=None):
+    if rname is None:
+        rname = 'r' + name
+    return op(name, rname, func=func, args=2)
+
+def ops(names, args=2):
+    return [op(name, args=args) for name in names]
+
+def rops(*names):
+    return [rop(*name) if isinstance(name, tuple) else rop(name) for name in names]
 
 
-# OMG what about py1
+OPS = rops(('eq', 'eq'), ('ne', 'ne'), ('lt', 'gt'), ('le', 'ge'), ('gt', 'lt'), ('ge', 'le'),
+            'add', 'sub', 'mul', 'floordiv', 'truediv', 'mod', 'pow',
+            'lshift', 'rshift', 'and', 'xor', 'or')                        \
+    + [rop('divmod', func=divmod)]                                         \
+    + ops(['neg', 'pos', 'abs', 'invert'], args=1)                         \
+    + [op('getattr', func=getattr), op('getitem')]
+
+# This things dropped in python 3
 if _py_version == 2:
-    OPS += [op('__div__', reversible=True), op('__cmp__', cmp)]
-elif _py_version == 3:
-    OPS += [op('__floordiv__', reversible=True)]
+    OPS += [rop('div'), op('cmp', func=cmp)]
 
-for name, op, args, reversible in OPS:
+for op in OPS:
+    name, rname, func, args = op
     if args == 1:
-        setattr(Whatever, name, unary(op))
-        setattr(WhateverCode, name, code_unary(op))
+        setattr(Whatever, name, unary(func))
+        setattr(WhateverCode, name, code_unary(func))
     elif args == 2:
         setattr(Whatever, name, binary(op))
         setattr(WhateverCode, name, binary(op))
-        if reversible:
-            setattr(Whatever, rname(name), rbinary(op))
-            setattr(WhateverCode, rname(name), rbinary(op))
+        if rname:
+            setattr(Whatever, rname, rbinary(op))
+            setattr(WhateverCode, rname, rbinary(op))
 
 _ = that = Whatever()
