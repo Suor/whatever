@@ -45,40 +45,12 @@ class WhateverCode(object):
     def __contains__(self, other):
         raise NotImplementedError('Sorry, can\'t hook "in" operator in this way')
 
-    # erk
-    if _py_version == 2:
-        @property
-        def __code__(self):
-            return types.CodeType(
-                self._arity,
-                self._arity,
-                0,
-                0,
-                '',
-                (),
-                (),
-                (),
-                '',
-                'operator',
-                0,
-                '')
-    elif _py_version == 3:
-        @property
-        def __code__(self):
-            return types.CodeType(
-                self._arity,
-                0,  # co_kwonlyargcount
-                self._arity,
-                0,
-                0,
-                b'',
-                (),
-                (),
-                (),
-                '',
-                'operator',
-                0,
-                b'')
+    @property
+    def __code__(self):
+        # Add co_kwonlyargcount for Python 3
+        args = ((self._arity, self._arity) if _py_version == 2 else (self._arity, 0, self._arity)) \
+             + (0, 0, b'', (), (), (), '', 'operator', 0, b'')
+        return types.CodeType(*args)
 
 
 def unary(op):
