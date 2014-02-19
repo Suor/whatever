@@ -39,9 +39,6 @@ class WhateverCode(object):
         sub_cls = type('WhateverCodeCall', (WhateverCode,), {'__call__': staticmethod(func)})
         return sub_cls(arity)
 
-    def __nonzero__(self):
-        return False
-
     def __contains__(self, other):
         raise NotImplementedError('Sorry, can\'t hook "in" operator in this way')
 

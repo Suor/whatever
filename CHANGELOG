@@ -2,6 +2,7 @@
 - support arity introspection for unary ops
 Backward incompatible changes:
 - previous clumsy support for overloadded ops dropped
+- WhateverCode is now true in boolean context
 
 0.3
 - added Python 3 support (ashleyh)
