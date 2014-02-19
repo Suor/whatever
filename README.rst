@@ -51,3 +51,9 @@ In some special cases whatever can cause confusion:
         # `_ == something` produces callable, which is true
 
     [1, 2, _ * 2, None].index('hi') # => 2, since bool(_ * 2 == 'hi') is True
+
+
+TODO
+----
+
+- optimize item and attribute access by using ``itemgetter()`` and ``attrgetter()``
