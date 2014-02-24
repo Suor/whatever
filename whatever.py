@@ -88,8 +88,15 @@ def gen_binary(op, left, right):
         _lfunc = lambda x: func(left, x)
         lfunc = getattr(left, name, _lfunc) if name else _lfunc
     if rtype is D:
-        _rfunc = lambda x: func(x, right)
-        rfunc = getattr(right, rname, _rfunc) if rname else _rfunc
+        if name == '__getattr__':
+            assert isinstance(right, str)
+            # NOTE: eval('lambda x: x.%s' % right) is even faster, but to slow to construct
+            rfunc = operator.attrgetter(right)
+        elif name == '__getitem__':
+            rfunc = operator.itemgetter(right)
+        else:
+            _rfunc = lambda x: func(x, right)
+            rfunc = getattr(right, rname, _rfunc) if rname else _rfunc
 
     ops = {
         (W, D): lambda: rfunc,
