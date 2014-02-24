@@ -138,6 +138,8 @@ def test_chained_getitem():
 
 def test_higher_cardinality():
     assert (_ + _)(1, 2) == 3
+    assert (_ + _ + 1)(1, 2) == 4
+    assert (1 + (_ + _))(1, 2) == 4
     assert (_ ** _ ** _)(2, 3, 4) == 2 ** 3 ** 4
     assert ((_ ** _) ** _)(2, 3, 4) == (2 ** 3) ** 4
     assert (_ ** (_ ** _))(2, 3, 4) == 2 ** (3 ** 4)

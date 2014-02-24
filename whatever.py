@@ -77,13 +77,16 @@ def argcount(operand):
 
 def compose_codes(func, left, right):
     la = left._arity
-    return lambda *xs: func(left(*xs[:la]), right(*xs[la:]))
+    lcall = left.__call__ # Resolve embeded __call__ in advance
+    rcall = right.__call__
+    return lambda *xs: func(lcall(*xs[:la]), rcall(*xs[la:]))
 
 def gen_binary(op, left, right):
     W, C, D = Whatever, WhateverCode, None
     name, rname, func, args = op
     ltype, rtype = types = operand_type(left), operand_type(right)
 
+    # Constant incorporating optimizations
     if ltype is D:
         _lfunc = lambda x: func(left, x)
         lfunc = getattr(left, name, _lfunc) if name else _lfunc
@@ -98,14 +101,23 @@ def gen_binary(op, left, right):
             _rfunc = lambda x: func(x, right)
             rfunc = getattr(right, rname, _rfunc) if rname else _rfunc
 
+    # Resolve embeded __call__ in advance
+    if ltype is C:
+        lcall = left.__call__
+    if rtype is C:
+        rcall = right.__call__
+
     ops = {
         (W, D): lambda: rfunc,
         (D, W): lambda: lfunc,
-        (C, D): lambda: lambda *xs: rfunc(left(*xs)),
-        (D, C): lambda: lambda *xs: lfunc(right(*xs)),
+        # (C, D) are optimized for one argument variant
+        (C, D): lambda: (lambda x: rfunc(lcall(x))) if left._arity == 1 else \
+                        (lambda *xs: rfunc(lcall(*xs))),
+        (D, C): lambda: (lambda x: lfunc(right(x))) if right._arity == 1 else \
+                        (lambda *xs: lfunc(right(*xs))),
         (W, W): lambda: func,
-        (W, C): lambda: lambda x, *ys: func(x, right(*ys)),
-        (C, W): lambda: lambda *xs: func(left(*xs[:-1]), xs[-1]),
+        (W, C): lambda: lambda x, *ys: func(x, rcall(*ys)),
+        (C, W): lambda: lambda *xs: func(lcall(*xs[:-1]), xs[-1]),
         (C, C): lambda: compose_codes(func, left, right),
     }
     return WhateverCode.make_call(ops[types](), arity=argcount(left) + argcount(right))
