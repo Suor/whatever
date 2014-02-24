@@ -86,7 +86,7 @@ def gen_binary(op, left, right):
 
     if ltype is D:
         _lfunc = lambda x: func(left, x)
-        lfunc = getattr(left, name, _lfunc) if rname else _lfunc
+        lfunc = getattr(left, name, _lfunc) if name else _lfunc
     if rtype is D:
         _rfunc = lambda x: func(x, right)
         rfunc = getattr(right, rname, _rfunc) if rname else _rfunc
