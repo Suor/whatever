@@ -1,3 +1,4 @@
+0.4
 - significant optimizations
 - support arity introspection for unary ops
 Backward incompatible changes:
