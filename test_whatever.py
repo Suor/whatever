@@ -42,6 +42,11 @@ def test_add():
     assert ('y' + _)('x') == 'yx'
 
 
+def test_late_binding():
+    assert (_ * 2)(2) == 4
+    assert (_ * 2)('2') == '22'
+
+
 @pytest.mark.xfail
 def test_overloaded():
     class StickyString(str):
