@@ -51,3 +51,10 @@ In some special cases whatever can cause confusion:
         # `_ == something` produces callable, which is true
 
     [1, 2, _ * 2, None].index('hi') # => 2, since bool(_ * 2 == 'hi') is True
+
+
+Also, whatever sometimes fails on late binding:
+
+.. code:: python
+
+    (_ * 2)('2') # -> NotImplemented

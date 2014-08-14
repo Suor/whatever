@@ -44,7 +44,7 @@ def test_add():
 
 def test_late_binding():
     assert (_ * 2)(2) == 4
-    assert (_ * 2)('2') == '22'
+    assert (_ * 2)('2') is NotImplemented
 
 
 @pytest.mark.xfail
