@@ -177,4 +177,3 @@ def test_contains():
 #     assert callable(_.meth())
 #     assert _.meth()(a) == 1
 #     assert _.meth_with_arg(10)(a) == 20
-

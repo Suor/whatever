@@ -10,7 +10,6 @@ __all__ = ['_', 'that']
 _py_version = sys.version_info[0]
 PYPY3 = _py_version == 3 and 'PyPy' in sys.version
 
-from types import CodeType
 # HACK: a workaround for pypy3 bug -
 #       https://bitbucket.org/pypy/pypy/issue/1844/memoryerror-in-pypy3
 if PYPY3:
@@ -21,6 +20,8 @@ if PYPY3:
         'co_varnames', 'co_filename', 'co_name', 'co_firstlineno',
         'co_lnotab'
     ])
+else:
+    from types import CodeType
 
 
 # TODO: or not to do
@@ -128,9 +129,9 @@ def gen_binary(op, left, right):
         (W, D): lambda: rfunc,
         (D, W): lambda: lfunc,
         # (C, D) are optimized for one argument variant
-        (C, D): lambda: (lambda x: rfunc(lcall(x))) if left._arity == 1 else \
+        (C, D): lambda: (lambda x: rfunc(lcall(x))) if left._arity == 1 else
                         (lambda *xs: rfunc(lcall(*xs))),
-        (D, C): lambda: (lambda x: lfunc(right(x))) if right._arity == 1 else \
+        (D, C): lambda: (lambda x: lfunc(right(x))) if right._arity == 1 else
                         (lambda *xs: lfunc(right(*xs))),
         (W, W): lambda: func,
         (W, C): lambda: lambda x, *ys: func(x, rcall(*ys)),
