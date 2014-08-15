@@ -1,4 +1,6 @@
+0.4.1
 - support pypy3 and python 3.4
+- document late binding not supported
 
 0.4
 - significant optimizations
