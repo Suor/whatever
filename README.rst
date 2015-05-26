@@ -58,3 +58,6 @@ Also, whatever sometimes fails on late binding:
 .. code:: python
 
     (_ * 2)('2') # -> NotImplemented
+    
+Additionally ``whatever._`` is incompatible with IPython's output caching
+(enabled by default) which uses ``_`` to store the previous result, see https://ipython.org/ipython-doc/dev/interactive/reference.html#output-caching-system.
