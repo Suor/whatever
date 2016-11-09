@@ -1,3 +1,6 @@
+0.4.2
+- explicit support for Python 3.5 (Felix Yan)
+
 0.4.1
 - support pypy3 and python 3.4
 - document late binding not supported
