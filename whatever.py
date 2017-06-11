@@ -155,22 +155,20 @@ def op(name, rname=None, func=None, args=2):
         rname = '__%s__' % rname
     return (name, rname, func or getattr(operator, name), args)
 
-def rop(name, rname=None, func=None):
-    if rname is None:
-        rname = 'r' + name
-    return op(name, rname, func=func, args=2)
+def rop(name, func=None):
+    return op(name, 'r' + name, func=func, args=2)
 
 def ops(names, args=2):
     return [op(name, args=args) for name in names]
 
-def rops(*names):
-    return [rop(*name) if isinstance(name, tuple) else rop(name) for name in names]
+def rops(names):
+    return [rop(name) for name in names]
 
 
-OPS = rops(('eq', 'eq'), ('ne', 'ne'), ('lt', 'gt'), ('le', 'ge'), ('gt', 'lt'), ('ge', 'le'),
-            'add', 'sub', 'mul', 'floordiv', 'truediv', 'mod', 'pow',
-            'lshift', 'rshift', 'and', 'xor', 'or')                        \
+OPS = rops(['add', 'sub', 'mul', 'floordiv', 'truediv', 'mod', 'pow',
+            'lshift', 'rshift', 'and', 'xor', 'or'])                       \
     + [rop('divmod', func=divmod)]                                         \
+    + ops(['eq', 'ne', 'lt', 'le', 'gt', 'ge'])                            \
     + ops(['neg', 'pos', 'abs', 'invert'], args=1)                         \
     + [op('getattr', func=getattr), op('getitem')]
 
