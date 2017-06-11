@@ -5,23 +5,10 @@ The Whatever object inspired by Perl 6 one.
 See http://perlcabal.org/syn/S02.html#The_Whatever_Object
 """
 import operator, sys
+from types import CodeType
 
 __all__ = ['_', 'that']
-_py_version = sys.version_info[0]
-PYPY3 = _py_version == 3 and 'PyPy' in sys.version
-
-# HACK: a workaround for pypy3 bug -
-#       https://bitbucket.org/pypy/pypy/issue/1844/memoryerror-in-pypy3
-if PYPY3:
-    import collections
-    CodeType = collections.namedtuple('CodeType', [
-        'co_argcount', 'co_kwonlyargcount', 'co_nlocals', 'co_stacksize',
-        'co_flags', 'co_code', 'co_consts', 'co_names',
-        'co_varnames', 'co_filename', 'co_name', 'co_firstlineno',
-        'co_lnotab'
-    ])
-else:
-    from types import CodeType
+PY2 = sys.version_info[0] == 2
 
 
 # TODO: or not to do
@@ -59,7 +46,7 @@ class WhateverCode(object):
     @property
     def __code__(self):
         # Add co_kwonlyargcount for Python 3
-        args = ((self._arity, self._arity) if _py_version == 2 else (self._arity, 0, self._arity)) \
+        args = ((self._arity, self._arity) if PY2 else (self._arity, 0, self._arity)) \
              + (0, 0, b'', (), (), (), '', 'operator', 0, b'')
         return CodeType(*args)
 
@@ -103,11 +90,7 @@ def gen_binary(op, left, right):
     # Constant incorporating optimizations
     if ltype is D:
         _lfunc = lambda x: func(left, x)
-        # HACK: workaround for pypy3 bug - https://bitbucket.org/pypy/pypy/issue/1845
-        if PYPY3 and left is None:
-            lfunc = _lfunc
-        else:
-            lfunc = getattr(left, name, _lfunc) if name else _lfunc
+        lfunc = getattr(left, name, _lfunc) if name else _lfunc
     if rtype is D:
         if name == '__getattr__':
             assert isinstance(right, str)
@@ -173,7 +156,7 @@ OPS = rops(['add', 'sub', 'mul', 'floordiv', 'truediv', 'mod', 'pow',
     + [op('getattr', func=getattr), op('getitem')]
 
 # This things were dropped in python 3
-if _py_version == 2:
+if PY2:
     OPS += [rop('div'), op('cmp', func=cmp)]
 
 for op in OPS:
