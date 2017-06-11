@@ -162,18 +162,3 @@ def test_code_to_code():
 
 def test_contains():
     with pytest.raises(NotImplementedError): 1 in _
-
-
-# def test_methodcall():
-#     class A(object):
-#         def meth(self):
-#             return 1
-
-#         def meth_with_arg(self, x):
-#             return x * 2
-#     a = A()
-
-#     assert callable(_.meth)
-#     assert callable(_.meth())
-#     assert _.meth()(a) == 1
-#     assert _.meth_with_arg(10)(a) == 20
