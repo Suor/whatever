@@ -1,3 +1,7 @@
+0.4.3
+- explicit support for Python 3.6
+- minor optimizations
+
 0.4.2
 - explicit support for Python 3.5 (Felix Yan)
 
