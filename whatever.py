@@ -17,14 +17,6 @@ PY2 = sys.version_info[0] == 2
 # TODO: pow with module arg:
 # object.__pow__(self, other[, modulo])
 
-# NOTE: Is this possible:
-#     map(_.meth(1,2,3), objects)
-# A problem that _.meth when called should return a "meth" attribute of it's caller
-# not schedule call as here.
-# NOTE: Maybe use some javascript-like syntax:
-#       _.meth.call(1,2,3) # or
-#       _.call('meth', 1,2,3)
-
 
 class Whatever(object):
     def __contains__(self, other):
