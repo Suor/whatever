@@ -174,7 +174,7 @@ OPS = rops(('eq', 'eq'), ('ne', 'ne'), ('lt', 'gt'), ('le', 'ge'), ('gt', 'lt'),
     + ops(['neg', 'pos', 'abs', 'invert'], args=1)                         \
     + [op('getattr', func=getattr), op('getitem')]
 
-# This things dropped in python 3
+# This things were dropped in python 3
 if _py_version == 2:
     OPS += [rop('div'), op('cmp', func=cmp)]
 
