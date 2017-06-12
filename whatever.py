@@ -70,7 +70,7 @@ def argcount(operand):
 
 def compose_codes(func, left, right):
     la = left._arity
-    lcall = left.__call__ # Resolve embeded __call__ in advance
+    lcall = left.__call__ # Resolve embedded __call__ in advance
     rcall = right.__call__
     return lambda *xs: func(lcall(*xs[:la]), rcall(*xs[la:]))
 
@@ -94,7 +94,7 @@ def gen_binary(op, left, right):
             _rfunc = lambda x: func(x, right)
             rfunc = getattr(right, rname, _rfunc) if rname else _rfunc
 
-    # Resolve embeded __call__ in advance
+    # Resolve embedded __call__ in advance
     if ltype is C:
         lcall = left.__call__
     if rtype is C:
