@@ -74,6 +74,7 @@ def gen_binary(op, left, right):
     ltype, rtype = types = operand_type(left), operand_type(right)
 
     # Constant incorporating optimizations
+    lfunc = rfunc = None
     if ltype is D:
         _lfunc = lambda x: func(left, x)
         lfunc = getattr(left, name, _lfunc) if name else _lfunc
@@ -96,19 +97,19 @@ def gen_binary(op, left, right):
     largs, rargs = argcount(left), argcount(right)
 
     ops = {
-        (W, D): lambda: rfunc,
-        (D, W): lambda: lfunc,
+        (W, D): rfunc,
+        (D, W): lfunc,
         # (C, D) are optimized for one argument variant
-        (C, D): (lambda: lambda x: rfunc(lcall(x))) if largs == 1 else
-                        (lambda: lambda *xs: rfunc(lcall(*xs))),
-        (D, C): (lambda: lambda x: lfunc(right(x))) if rargs == 1 else
-                        (lambda: lambda *xs: lfunc(right(*xs))),
-        (W, W): lambda: func,
-        (W, C): lambda: lambda x, *ys: func(x, rcall(*ys)),
-        (C, W): lambda: lambda *xs: func(lcall(*xs[:-1]), xs[-1]),
-        (C, C): lambda: lambda *xs: func(lcall(*xs[:largs]), rcall(*xs[largs:])),
+        (C, D): (lambda x: rfunc(lcall(x))) if largs == 1 else
+                        (lambda *xs: rfunc(lcall(*xs))),
+        (D, C): (lambda x: lfunc(rcall(x))) if rargs == 1 else
+                        (lambda *xs: lfunc(rcall(*xs))),
+        (W, W): func,
+        (W, C): lambda x, *ys: func(x, rcall(*ys)),
+        (C, W): lambda *xs: func(lcall(*xs[:-1]), xs[-1]),
+        (C, C): lambda *xs: func(lcall(*xs[:largs]), rcall(*xs[largs:])),
     }
-    return WhateverCode.make_call(ops[types](), arity=largs + rargs)
+    return WhateverCode.make_call(ops[types], arity=largs + rargs)
 
 def binary(op):
     return lambda left, right: gen_binary(op, left, right)
