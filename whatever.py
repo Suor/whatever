@@ -35,11 +35,14 @@ class WhateverCode(object):
     def __contains__(self, other):
         raise NotImplementedError('Sorry, can\'t hook "in" operator in this way')
 
+    # TODO: __defaults__?
+
     @property
     def __code__(self):
         # Add co_kwonlyargcount for Python 3
+        # TODO: better co_varnames and co_names
         args = ((self._arity, self._arity) if PY2 else (self._arity, 0, self._arity)) \
-             + (0, 0, b'', (), (), (), '', 'operator', 0, b'')
+             + (0, 0, b'', (), (), (), '', 'operator', 0, b'') #
         return CodeType(*args)
 
 
