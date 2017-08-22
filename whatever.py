@@ -22,6 +22,10 @@ class Whatever(object):
     def __contains__(self, other):
         raise NotImplementedError('Sorry, can\'t to hook "in" operator in this way')
 
+    @staticmethod
+    def __call__(*args, **kwargs):
+        return WhateverCode.make_call(lambda f: f(*args, **kwargs), 1)
+
 
 class WhateverCode(object):
     def __init__(self, arity):

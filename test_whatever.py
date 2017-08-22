@@ -6,6 +6,11 @@ def test_basic():
     assert _ is that
 
 
+def test_caller():
+    assert _(11)(lambda x: x ** 2) == 121
+    assert _('100', base=11)(int) == 121
+
+
 def test_attrs():
     assert callable(_.attr)
 
