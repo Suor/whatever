@@ -26,6 +26,9 @@ class Whatever(object):
     def __call__(*args, **kwargs):
         return WhateverCode.make_call(lambda f: f(*args, **kwargs), 1)
 
+    __code__ = CodeType(*((1, 1) if PY2 else (1, 0, 1)) +
+                         (1, 67, b'', (), (), ('f',), __name__, 'Whatever', 1, b''))
+
 
 class WhateverCode(object):
     def __init__(self, arity):
@@ -39,14 +42,14 @@ class WhateverCode(object):
     def __contains__(self, other):
         raise NotImplementedError('Sorry, can\'t hook "in" operator in this way')
 
-    # TODO: __defaults__?
-
+    # Simulate normal callable
     @property
     def __code__(self):
-        # Add co_kwonlyargcount for Python 3
-        # TODO: better co_varnames and co_names
+        fname = self.__call__.__name__ or 'operator'
+        varnames = tuple('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self._arity])
+        # Adding co_kwonlyargcount for Python 3
         args = ((self._arity, self._arity) if PY2 else (self._arity, 0, self._arity)) \
-             + (0, 0, b'', (), (), (), '', 'operator', 0, b'') #
+             + (1, 67, b'', (), (), varnames, __name__, fname, 1, b'')
         return CodeType(*args)
 
 
@@ -152,7 +155,7 @@ OPS = rops(['add', 'sub', 'mul', 'floordiv', 'truediv', 'mod', 'pow',
 
 # This things were dropped in python 3
 if PY2:
-    OPS += [rop('div'), op('cmp', func=cmp)]
+    OPS += [rop('div'), op('cmp', func=cmp)]  # noqa
 
 for op in OPS:
     name, rname, func, args = op

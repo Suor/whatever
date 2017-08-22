@@ -155,10 +155,22 @@ def test_higher_cardinality():
     assert (_ ** (_ ** _))(2, 3, 4) == 2 ** (3 ** 4)
 
 
+def test_introspect_whatever():
+    code = _.__code__
+    assert code.co_argcount == 1
+    assert len(code.co_varnames) == 1
+    assert code.co_nlocals == 1
+
+
 def test_introspection():
     assert (_ + 1).__code__.co_argcount == 1
     assert (_ + _).__code__.co_argcount == 2
     assert (_ + 1 + _).__code__.co_argcount == 2
+
+    code = (_ + _).__code__
+    assert 'add' in code.co_name
+    assert len(code.co_varnames) == 2
+    assert code.co_nlocals == 2
 
 
 def test_code_to_code():
