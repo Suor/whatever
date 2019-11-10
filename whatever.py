@@ -49,9 +49,9 @@ class WhateverCode(object):
         fname = self.__call__.__name__ or 'operator'
         varnames = tuple('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self._arity])
         # Adding co_kwonlyargcount for Python 3
-        args = ((self._arity, self._arity) if PY2 else (self._arity, 0, 0, self._arity) \
-             if PY38 else (self._arity, 0, self._arity)) \
-             + (1, 67, b'', (), (), varnames, __name__, fname, 1, b'')
+        args = ((self._arity, self._arity) if PY2 else (self._arity, 0, 0, self._arity)
+                 if PY38 else (self._arity, 0, self._arity)) + \
+                (1, 67, b'', (), (), varnames, __name__, fname, 1, b'')
         return CodeType(*args)
 
 
