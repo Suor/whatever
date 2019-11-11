@@ -9,6 +9,7 @@ from types import CodeType
 
 __all__ = ['_', 'that']
 PY2 = sys.version_info[0] == 2
+PY38 = sys.version_info[:2] >= (3, 8)
 
 
 # TODO: or not to do
@@ -26,7 +27,7 @@ class Whatever(object):
     def __call__(*args, **kwargs):
         return WhateverCode.make_call(lambda f: f(*args, **kwargs), 1)
 
-    __code__ = CodeType(*((1, 1) if PY2 else (1, 0, 1)) +
+    __code__ = CodeType(*((1, 1) if PY2 else (1, 0, 0, 1) if PY38 else (1, 0, 1)) +
                          (1, 67, b'', (), (), ('f',), __name__, 'Whatever', 1, b''))
 
 
@@ -48,8 +49,9 @@ class WhateverCode(object):
         fname = self.__call__.__name__ or 'operator'
         varnames = tuple('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self._arity])
         # Adding co_kwonlyargcount for Python 3
-        args = ((self._arity, self._arity) if PY2 else (self._arity, 0, self._arity)) \
-             + (1, 67, b'', (), (), varnames, __name__, fname, 1, b'')
+        args = ((self._arity, self._arity) if PY2 else (self._arity, 0, 0, self._arity)
+                 if PY38 else (self._arity, 0, self._arity)) + \
+                (1, 67, b'', (), (), varnames, __name__, fname, 1, b'')
         return CodeType(*args)
 
 
