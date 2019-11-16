@@ -1,3 +1,9 @@
+0.6
+- support Python 3.8 (Felix Yan)
+- explicit support for Python 3.7
+Backward incompatible changes:
+- dropped Python 2.6 and 3.3 support
+
 0.5
 - added caller functionality to whatever
 - improved __code__ introspection
