@@ -27,8 +27,8 @@ class Whatever(object):
     def __call__(*args, **kwargs):
         return WhateverCode.make_call(lambda f: f(*args, **kwargs), 1)
 
-    __code__ = CodeType(*((1, 1) if PY2 else (1, 0, 0, 1) if PY38 else (1, 0, 1)) +
-                         (1, 67, b'', (), (), ('f',), __name__, 'Whatever', 1, b''))
+    __code__ = CodeType(*((1, 1) if PY2 else (1, 0, 0, 1) if PY38 else (1, 0, 1))
+                        + (1, 67, b'', (), (), ('f',), __name__, 'Whatever', 1, b''))
 
 
 class WhateverCode(object):
