@@ -10,6 +10,7 @@ from types import CodeType
 __all__ = ['_', 'that']
 PY2 = sys.version_info[0] == 2
 PY38 = sys.version_info[:2] >= (3, 8)
+PY311 = sys.version_info[:2] >= (3, 11)
 
 
 # TODO: or not to do
@@ -17,6 +18,20 @@ PY38 = sys.version_info[:2] >= (3, 8)
 
 # TODO: pow with module arg:
 # object.__pow__(self, other[, modulo])
+
+
+def _make_code(arity, name, varnames):
+    # Python 3 got kwonlyargcount, Python 3.8 got posonlyargcount
+    args = [arity, arity] if PY2 else [arity, 0, 0, arity] if PY38 else [arity, 0, arity]
+    args.extend([1, 67, b'', (), (), varnames, __name__, name])
+    # Python 3.11 got qualname
+    if PY311:
+        args.append('%s.%s' % (__name__, name))
+    args.extend([1, b''])
+    # Python 3.11 got exceptiontable
+    if PY311:
+        args.append(b'')
+    return CodeType(*args)
 
 
 class Whatever(object):
@@ -27,8 +42,7 @@ class Whatever(object):
     def __call__(*args, **kwargs):
         return WhateverCode.make_call(lambda f: f(*args, **kwargs), 1)
 
-    __code__ = CodeType(*((1, 1) if PY2 else (1, 0, 0, 1) if PY38 else (1, 0, 1))
-                        + (1, 67, b'', (), (), ('f',), __name__, 'Whatever', 1, b''))
+    __code__ = _make_code(1, 'Whatever', ('f',))
 
 
 class WhateverCode(object):
@@ -48,11 +62,7 @@ class WhateverCode(object):
     def __code__(self):
         fname = self.__call__.__name__ or 'operator'
         varnames = tuple('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self._arity])
-        # Adding co_kwonlyargcount for Python 3
-        args = ((self._arity, self._arity) if PY2 else (self._arity, 0, 0, self._arity)
-                 if PY38 else (self._arity, 0, self._arity)) + \
-                (1, 67, b'', (), (), varnames, __name__, fname, 1, b'')
-        return CodeType(*args)
+        return _make_code(self._arity, fname, varnames)
 
 
 ### Unary ops
