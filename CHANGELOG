@@ -1,3 +1,7 @@
+0.7
+- support Python 3.11
+- include CHANGELOG into a release (Igor Gnatenko)
+
 0.6
 - support Python 3.8 (Felix Yan)
 - explicit support for Python 3.7
